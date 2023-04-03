@@ -190,6 +190,8 @@ Broadcast the current playback state:
       },
       // Which controls to show in Android's compact view.
       androidCompactActionIndices: const [0, 1, 3],
+      // Which actions to be added to Android Auto as a custom action
+      androidAutoCustomActions: [],
       // Whether audio is ready, buffering, ...
       processingState: AudioProcessingState.ready,
       // Whether audio is playing

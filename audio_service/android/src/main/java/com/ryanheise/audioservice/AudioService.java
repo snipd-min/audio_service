@@ -268,6 +268,7 @@ public class AudioService extends MediaBrowserServiceCompat {
     private List<MediaControl> actions = new ArrayList<>();
     private List<NotificationCompat.Action> nativeActions = new ArrayList<>();
     private int[] compactActionIndices;
+    private List<MediaControl> androidAutoCustomActions = new ArrayList<>();
     private MediaMetadataCompat mediaMetadata;
     private Bitmap artBitmap;
     private String notificationChannelId;
@@ -366,6 +367,7 @@ public class AudioService extends MediaBrowserServiceCompat {
         actions.clear();
         artBitmapCache.evictAll();
         compactActionIndices = null;
+        androidAutoCustomActions.clear();
         releaseMediaSession();
         legacyStopForeground(!config.androidResumeOnClick);
         // This still does not solve the Android 11 problem.
@@ -432,6 +434,13 @@ public class AudioService extends MediaBrowserServiceCompat {
                 buildMediaButtonPendingIntent(actionCode));
     }
 
+    PlaybackStateCompat.CustomAction createAutoAction(String resource, String label, long actionCode) {
+        int iconId = getResourceId(resource);
+        return new PlaybackStateCompat.CustomAction
+                .Builder(label, label, iconId)
+                .build();
+    }
+
     PendingIntent buildMediaButtonPendingIntent(long action) {
         int keyCode = toKeyCode(action);
         if (keyCode == KeyEvent.KEYCODE_UNKNOWN)
@@ -456,7 +465,7 @@ public class AudioService extends MediaBrowserServiceCompat {
         return PendingIntent.getBroadcast(this, 0, intent, flags);
     }
 
-    void setState(List<MediaControl> actions, long actionBits, int[] compactActionIndices, AudioProcessingState processingState, boolean playing, long position, long bufferedPosition, float speed, long updateTime, Integer errorCode, String errorMessage, int repeatMode, int shuffleMode, boolean captioningEnabled, Long queueIndex) {
+    void setState(List<MediaControl> actions, long actionBits, int[] compactActionIndices, List<MediaControl> androidAutoCustomActions, AudioProcessingState processingState, boolean playing, long position, long bufferedPosition, float speed, long updateTime, Integer errorCode, String errorMessage, int repeatMode, int shuffleMode, boolean captioningEnabled, Long queueIndex) {
         boolean notificationChanged = false;
         if (!Arrays.equals(compactActionIndices, this.compactActionIndices)) {
             notificationChanged = true;
@@ -464,7 +473,11 @@ public class AudioService extends MediaBrowserServiceCompat {
         if (!actions.equals(this.actions)) {
             notificationChanged = true;
         }
+        if (!androidAutoCustomActions.equals(this.androidAutoCustomActions)) {
+            notificationChanged = true;
+        }
         this.actions = actions;
+        this.androidAutoCustomActions = androidAutoCustomActions;
         this.nativeActions.clear();
         for (MediaControl action : actions) {
             nativeActions.add(createAction(action.icon, action.label, action.actionCode));
@@ -481,6 +494,9 @@ public class AudioService extends MediaBrowserServiceCompat {
                 .setActions(AUTO_ENABLED_ACTIONS | actionBits)
                 .setState(getPlaybackState(), position, speed, updateTime)
                 .setBufferedPosition(bufferedPosition);
+        for (MediaControl androidAutoCustomAction : androidAutoCustomActions) {
+            stateBuilder.addCustomAction(createAutoAction(androidAutoCustomAction.icon, androidAutoCustomAction.label, androidAutoCustomAction.actionCode));
+        }
         if (queueIndex != null)
             stateBuilder.setActiveQueueItemId(queueIndex);
         if (errorCode != null && errorMessage != null)

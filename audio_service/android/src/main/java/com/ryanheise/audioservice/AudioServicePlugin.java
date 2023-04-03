@@ -847,6 +847,7 @@ public class AudioServicePlugin implements FlutterPlugin, ActivityAware {
                 boolean playing = (Boolean)stateMap.get("playing");
                 @SuppressWarnings("unchecked") List<Map<?, ?>> rawControls = (List<Map<?, ?>>)stateMap.get("controls");
                 @SuppressWarnings("unchecked") List<Object> compactActionIndexList = (List<Object>)stateMap.get("androidCompactActionIndices");
+                @SuppressWarnings("unchecked") List<Map<?, ?>> rawAndroidAutoCustomActions = (List<Map<?, ?>>)stateMap.get("androidAutoCustomActions");
                 @SuppressWarnings("unchecked") List<Integer> rawSystemActions = (List<Integer>)stateMap.get("systemActions");
                 long position = getLong(stateMap.get("updatePosition"));
                 long bufferedPosition = getLong(stateMap.get("bufferedPosition"));
@@ -882,10 +883,17 @@ public class AudioServicePlugin implements FlutterPlugin, ActivityAware {
                     for (int i = 0; i < compactActionIndices.length; i++)
                         compactActionIndices[i] = (Integer)compactActionIndexList.get(i);
                 }
+                List<MediaControl> androidAutoCustomActions = new ArrayList<>();
+                for (Map<?, ?> rawAndroidAutoCustomAction : rawAndroidAutoCustomActions) {
+                    String resource = (String)rawAndroidAutoCustomAction.get("androidIcon");
+                    String label = (String)rawAndroidAutoCustomAction.get("label");
+                    androidAutoCustomActions.add(new MediaControl(resource, label, 0));
+                }
                 AudioService.instance.setState(
                         actions,
                         actionBits,
                         compactActionIndices,
+                        androidAutoCustomActions,
                         processingState,
                         playing,
                         position,

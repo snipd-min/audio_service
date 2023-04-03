@@ -102,6 +102,9 @@ enum MediaAction {
 
   /// Set speed.
   setSpeed,
+
+  /// Custom action
+  customAction,
 }
 
 /// The states of audio processing.
@@ -166,6 +169,9 @@ class PlaybackState {
   /// media notification view. When the notification is expanded, all [controls]
   /// will be shown.
   final List<int>? androidCompactActionIndices;
+
+  /// List of custom controls to be shown in Android Auto
+  final List<MediaControl> androidAutoCustomActions;
 
   /// The set of system actions currently enabled. This is for specifying any
   /// other [MediaAction]s that are not supported by [controls], because they do
@@ -235,6 +241,7 @@ class PlaybackState {
     this.playing = false,
     this.controls = const [],
     this.androidCompactActionIndices,
+    this.androidAutoCustomActions = const [],
     this.systemActions = const {},
     this.updatePosition = Duration.zero,
     this.bufferedPosition = Duration.zero,
@@ -282,6 +289,9 @@ class PlaybackState {
         systemActions: systemActions
             .map((action) => MediaActionMessage.values[action.index])
             .toSet(),
+        androidAutoCustomActions: androidAutoCustomActions
+            .map((control) => control._toMessage())
+            .toList(),
         updatePosition: updatePosition,
         bufferedPosition: bufferedPosition,
         speed: speed,
@@ -350,6 +360,7 @@ abstract class PlaybackStateCopyWith {
     List<MediaControl> controls,
     List<int>? androidCompactActionIndices,
     Set<MediaAction> systemActions,
+    List<MediaControl> androidAutoCustomActions,
     Duration updatePosition,
     Duration bufferedPosition,
     double speed,
@@ -379,6 +390,7 @@ class _PlaybackStateCopyWith extends PlaybackStateCopyWith {
     Object? controls = _fakeNull,
     Object? androidCompactActionIndices = _fakeNull,
     Object? systemActions = _fakeNull,
+    Object? androidAutoCustomActions = _fakeNull,
     Object? updatePosition = _fakeNull,
     Object? bufferedPosition = _fakeNull,
     Object? speed = _fakeNull,
@@ -403,6 +415,9 @@ class _PlaybackStateCopyWith extends PlaybackStateCopyWith {
         systemActions: systemActions == _fakeNull
             ? value.systemActions
             : systemActions as Set<MediaAction>,
+        androidAutoCustomActions: androidAutoCustomActions == _fakeNull
+            ? value.androidAutoCustomActions
+            : androidAutoCustomActions as List<MediaControl>,
         updatePosition: updatePosition == _fakeNull
             ? value.updatePosition
             : updatePosition as Duration,
@@ -3718,8 +3733,8 @@ class AudioServiceBackground {
   @Deprecated("Use AudioHandler.subscribeToChildren instead.")
   static Future<void> notifyChildrenChanged(
       [String parentMediaId = AudioService.browsableRootId]) async {
-    await _platform.notifyChildrenChanged(
-        NotifyChildrenChangedRequest(parentMediaId: parentMediaId));
+    await _platform.notifyChildrenChanged(NotifyChildrenChangedRequest(
+        parentMediaId: parentMediaId, options: <String, dynamic>{}));
   }
 
   /// Deprecated. Use [AudioService.androidForceEnableMediaButtons] instead.

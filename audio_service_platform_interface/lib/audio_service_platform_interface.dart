@@ -260,6 +260,8 @@ enum MediaActionMessage {
   seekBackward,
   seekForward,
   setSpeed,
+
+  customAction,
 }
 
 class MediaControlMessage {
@@ -325,6 +327,9 @@ class PlaybackStateMessage {
   /// media notification view. When the notification is expanded, all [controls]
   /// will be shown.
   final List<int>? androidCompactActionIndices;
+
+  /// List of custom controls to be shown in Android Auto
+  final List<MediaControlMessage> androidAutoCustomActions;
 
   /// The set of system actions currently enabled. This is for specifying any
   /// other [MediaActionMessage]s that are not supported by [controls], because they do
@@ -392,6 +397,7 @@ class PlaybackStateMessage {
     this.playing = false,
     this.controls = const [],
     this.androidCompactActionIndices,
+    this.androidAutoCustomActions = const [],
     this.systemActions = const {},
     this.updatePosition = Duration.zero,
     this.bufferedPosition = Duration.zero,
@@ -417,6 +423,7 @@ class PlaybackStateMessage {
         systemActions: (map['systemActions'] as List)
             .map((dynamic action) => MediaActionMessage.values[action as int])
             .toSet(),
+        androidAutoCustomActions: const [],
         updatePosition: Duration(microseconds: map['updatePosition'] as int),
         bufferedPosition:
             Duration(microseconds: map['bufferedPosition'] as int),
@@ -439,6 +446,8 @@ class PlaybackStateMessage {
         'controls': controls.map((control) => control.toMap()).toList(),
         'androidCompactActionIndices': androidCompactActionIndices,
         'systemActions': systemActions.map((action) => action.index).toList(),
+        'androidAutoCustomActions':
+            androidAutoCustomActions.map((control) => control.toMap()).toList(),
         'updatePosition': updatePosition.inMilliseconds,
         'bufferedPosition': bufferedPosition.inMilliseconds,
         'speed': speed,
