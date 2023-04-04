@@ -2,6 +2,7 @@ name: audio_service
 description: Flutter plugin to play audio in the background while the screen is off.
 version: 0.18.9
 homepage: https://github.com/ryanheise/audio_service/tree/master/audio_service
+publish_to: none
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -9,26 +10,26 @@ environment:
 
 dependencies:
   # Use these deps for local development
-  audio_service_platform_interface:
-    path: ../audio_service_platform_interface
-  audio_service_web:
-    path: ../audio_service_web
+  # audio_service_platform_interface:
+  #   path: ../audio_service_platform_interface
+  # audio_service_web:
+  #   path: ../audio_service_web
 
-  # # Use these deps when pushing to origin (for the benefit of testers)
+  # Use these deps when pushing to origin (for the benefit of testers)
   # audio_service_platform_interface:
   #   git:
-  #     url: https://github.com/ryanheise/audio_service.git
-  #     ref: one-isolate
+  #     url: https://github.com/snipd-min/audio_service.git
+  #     ref: 31614ab836614b32b19579e4c62a7b0592648031
   #     path: audio_service_platform_interface
   # audio_service_web:
   #   git:
-  #     url: https://github.com/ryanheise/audio_service.git
-  #     ref: one-isolate
+  #     url: https://github.com/snipd-min/audio_service.git
+  #     ref: 31614ab836614b32b19579e4c62a7b0592648031
   #     path: audio_service_web
 
   # Use these deps when publishing.
-  # audio_service_platform_interface: ^0.1.0
-  # audio_service_web: ^0.1.1
+  audio_service_platform_interface: ^0.1.0
+  audio_service_web: ^0.1.1
 
   audio_session: ^0.1.6+1
   rxdart: ">=0.26.0 <0.28.0"
@@ -46,6 +47,13 @@ dev_dependencies:
   mockito: ^5.0.0
   fake_async: ^1.2.0
   flutter_lints: ^1.0.4
+
+dependency_overrides:
+  audio_service_platform_interface:
+    git:
+      url: https://github.com/snipd-min/audio_service.git
+      ref: 31614ab836614b32b19579e4c62a7b0592648031
+      path: audio_service_platform_interface
 
 flutter:
   plugin:
