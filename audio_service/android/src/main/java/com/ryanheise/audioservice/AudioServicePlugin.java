@@ -1,6 +1,7 @@
 package com.ryanheise.audioservice;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.os.SystemClock;
 import androidx.annotation.UiThread;
 import androidx.core.app.NotificationCompat;
 
+import android.provider.MediaStore;
 import android.support.v4.media.MediaBrowserCompat;
 
 import androidx.media.MediaBrowserServiceCompat;
@@ -135,6 +137,7 @@ public class AudioServicePlugin implements FlutterPlugin, ActivityAware {
     private static MediaBrowserCompat mediaBrowser;
     private static MediaControllerCompat mediaController;
     private static final MediaControllerCompat.Callback controllerCallback = new MediaControllerCompat.Callback() {
+
 //        @Override
 //        public void onMetadataChanged(MediaMetadataCompat metadata) {
 //            Map<String, Object> map = new HashMap<>();
@@ -370,6 +373,12 @@ public class AudioServicePlugin implements FlutterPlugin, ActivityAware {
 
     private void registerOnNewIntentListener() {
         activityPluginBinding.addOnNewIntentListener(newIntentListener = (intent) -> {
+            if(intent.getAction().equals(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)) {
+                audioHandlerInterface.onPlayFromSearch(
+                        intent.getExtras() != null ? intent.getExtras().getString(SearchManager.QUERY, "") : "",
+                        new Bundle()
+                );
+            }
             clientInterface.activity.setIntent(intent);
             sendNotificationClicked();
             return true;
