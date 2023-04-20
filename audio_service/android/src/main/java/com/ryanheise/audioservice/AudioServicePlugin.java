@@ -373,13 +373,15 @@ public class AudioServicePlugin implements FlutterPlugin, ActivityAware {
 
     private void registerOnNewIntentListener() {
         activityPluginBinding.addOnNewIntentListener(newIntentListener = (intent) -> {
-            if(intent.getAction().equals(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)) {
+            if(intent != null && intent.getAction() != null && intent.getAction().equals(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)) {
                 audioHandlerInterface.onPlayFromSearch(
                         intent.getExtras() != null ? intent.getExtras().getString(SearchManager.QUERY, "") : "",
                         new Bundle()
                 );
             }
-            clientInterface.activity.setIntent(intent);
+            if (clientInterface.activity != null) {
+                clientInterface.activity.setIntent(intent);
+            }
             sendNotificationClicked();
             return true;
         });
