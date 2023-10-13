@@ -3795,8 +3795,10 @@ class AudioServiceBackground {
   @Deprecated("Use AudioHandler.subscribeToChildren instead.")
   static Future<void> notifyChildrenChanged(
       [String parentMediaId = AudioService.browsableRootId]) async {
-    await _platform.notifyChildrenChanged(
-        NotifyChildrenChangedRequest(parentMediaId: parentMediaId));
+    await _platform.notifyChildrenChanged(NotifyChildrenChangedRequest(
+      parentMediaId: parentMediaId,
+      options: {},
+    ));
   }
 
   /// Deprecated. Use [AudioService.androidForceEnableMediaButtons] instead.
